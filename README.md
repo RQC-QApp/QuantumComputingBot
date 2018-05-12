@@ -2,11 +2,17 @@
 
 Monitoring the load of IBM Q processors from [IBM Quantum Experience](https://quantumexperience.ng.bluemix.net).
 
-You can try it here -> [@QuantumComputingBot](https://t.me/QuantumComputingBot).
+Bot is already available inside [QISKit](https://qiskit.org) workspace in [Slack](https://slack.com).<img src="img/qiskit-logo-black.png" href='http://rqc.ru/' width='10%' align='right'>
+
+| Overview |
+| :------------- |
+| <img src="img/img3.jpg" width="200px">       |
+
+You can try it here on [Telegram](https://telegram.org) -> [@QuantumComputingBot](https://t.me/QuantumComputingBot).<img src="img/telegram.png" href='http://rqc.ru/' width='10%' align='right'>
 
 | Overview | Statistics for ibmqx4 processor     |
 | :------------- | :------------- |
-| <img src="img/img1.jpg" width="300px">       | <img src="img/img2.jpg" width="300px">       |
+| <img src="img/img1.jpg" width="200px">       | <img src="img/img2.jpg" width="200px">       |
 
 ## Description
 
