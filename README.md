@@ -18,9 +18,7 @@ You can try it here on [Telegram](https://telegram.org) -> [@QuantumComputingBot
 
 Structure of the project:
 ```
-├── LICENSE
-├── README.md              <- This README.
-|
+...
 ├── main_slack.py          <- Slack bot.
 ├── main_telegram.py       <- Telegram bot.
 ├── main_dumper.py         <- Crawler that dumps statistics
@@ -47,7 +45,7 @@ Structure of the project:
 
 ## Authors
 
-[Yaroslav Kharkov](https://www.physics.unsw.edu.au/staff/yaroslav-kharkov) &lt;[y.kharkov@gmail.com](mailto:y.kharkov@gmail.com)&gt;, [Anton Karazeev](https://akarazeev.github.io) &lt;[a.karazeev@rqc.ru](mailto:a.karazeev@rqc.ru)&gt;
+🇦🇺🇷🇺[Yaroslav Kharkov](https://www.physics.unsw.edu.au/staff/yaroslav-kharkov) &lt;[y.kharkov@gmail.com](mailto:y.kharkov@gmail.com)&gt;, [Anton Karazeev](https://akarazeev.github.io) &lt;[a.karazeev@rqc.ru](mailto:a.karazeev@rqc.ru)&gt;
 
 ## Additional software
 
