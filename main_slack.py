@@ -1,85 +1,157 @@
-from slackclient import SlackClient
+from flask import abort, Flask, jsonify, request
+import requests
 import logging
-import json
-import time
-import os
 import utils
+import json
+import os
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - \
                             %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+app = Flask(__name__)
 
-slack_client = SlackClient(utils.get_token('res/token_slack.json'))
-starterbot_id = None
-
-# Constants.
-RTM_READ_DELAY = 0.1  # 1 second delay between reading from RTM.
-counter = 0
+slack_token = utils.get_token('res/token_slack.json')
 
 
-def parse_bot_commands(slack_events):
-    for event in slack_events:
-        if event["type"] == "message" and "subtype" not in event:
-            message = event["text"]
-            return message, event["channel"]
-    return None, None
+###
+# Slack API
+###
+
+@app.route('/confirm', methods=['POST'])
+def confirm():
+    req = request.form.to_dict()
+    data = json.loads(req["payload"])
+    backend = data["actions"][0]["name"]
+    value = data["actions"][0]["value"]
+
+    payload = {
+        "text": "Ok :slightly_smiling_face:",
+    }
+    headers = {
+        'content-type': "application/json",
+    }
+    response = requests.request("POST", data['response_url'], data=json.dumps(payload), headers=headers)
+    print(response.text)
+
+    send_image('tmp/{}'.format(value), backend, data['channel']['id'])
+
+    return ""
 
 
-def handle_command(command, channel):
-    global counter
-    backend = command.lower()
+###
+# Bot Commands
+###
+@app.route('/calibration', methods=['POST'])
+def calibration():
+    data = request.form.to_dict()
+    backend = data['text'].lower()
+
+    extension = '_multiqubut_err.png'
 
     if backend in utils.backends:
-        counter += 1
-        response = "Wait a sec ..."
-        slack_client.api_call(
-            "chat.postMessage",
-            channel=channel,
-            text=response
-        )
-        # utils.create_statistics(backend)
-        slack_client.api_call(
-            'files.upload',
-            channels=channel,
-            as_user=True,
-            filename=backend,
-            file=open('tmp/{}_to_send.png'.format(backend), 'rb'),
-        )
-    elif command == 'info':
-        response = str(counter)
-        slack_client.api_call(
-            "chat.postMessage",
-            channel=channel,
-            text=response
-        )
+        quick_response(data['response_url'])
+        send_image('tmp/{}{}'.format(backend, extension), backend, data['channel_id'])
     else:
-        response = list()
-        response.append("I'm sorry, I don't understand!")
-        response.append("I understand only these messages: *ibmqx4* or *ibmqx5*")
-        response = '\n'.join(response)
-        slack_client.api_call(
-            "chat.postMessage",
-            channel=channel,
-            text=response
-        )
+        send_buttons(data["response_url"], extension)
+
+    return ""
 
 
-def main():
-    if slack_client.rtm_connect(with_team_state=False):
-        # Read bot's user ID by calling Web API method `auth.test`.
-        starterbot_id = slack_client.api_call("auth.test")["user_id"]
-        logger.info("Bot is connected and running!")
+@app.route('/jobs', methods=['POST'])
+def jobs():
+    data = request.form.to_dict()
+    backend = data['text'].lower()
 
-        while True:
-            command, channel = parse_bot_commands(slack_client.rtm_read())
-            if command:
-                handle_command(command, channel)
-            time.sleep(RTM_READ_DELAY)
+    extension = '.png'
+
+    if backend in utils.backends:
+        quick_response(data['response_url'])
+        send_image('tmp/{}{}'.format(backend, extension), backend, data['channel_id'])
     else:
-        logger.info("Connection failed. Exception traceback printed above.")
+        send_buttons(data["response_url"], extension)
+
+    return ""
 
 
-if __name__ == "__main__":
-    main()
+@app.route('/full', methods=['POST'])
+def full():
+    data = request.form.to_dict()
+    backend = data['text'].lower()
+
+    extension = '_to_send.png'
+
+    if backend in utils.backends:
+        quick_response(data['response_url'])
+        send_image('tmp/{}{}'.format(backend, extension), backend, data['channel_id'])
+    else:
+        send_buttons(data["response_url"], extension)
+
+    return ""
+
+
+###
+# Helper Functions
+###
+def quick_response(response_url):
+    payload = {
+        "text": "Wait a sec :hourglass_flowing_sand:",
+    }
+    headers = {
+        'content-type': "application/json",
+    }
+    response = requests.request("POST", response_url, data=json.dumps(payload), headers=headers)
+    print(response.text)
+
+
+def send_image(path, name, channel):
+    my_file = {
+        'file': (path, open(path, 'rb'), 'png')
+    }
+    payload = {
+        "filename": name,
+        'token': slack_token,
+        "channels": [channel]
+    }
+
+    response = requests.post("https://slack.com/api/files.upload", params=payload, files=my_file)
+
+
+def send_buttons(response_url, extension):
+    payload = {
+        "text": "What backend you are interested in?",
+        "attachments": [
+            {
+                "text": "Choose a backend :qiskit:",
+                "callback_id": 42,
+                "color": "#3AA3E3",
+                "attachment_type": "default",
+                "actions": [
+                    {
+                        "name": "ibmqx4",
+                        "text": "ibmqx4",
+                        "type": "button",
+                        "value": "ibmqx4{}".format(extension)
+                    },
+                    {
+                        "name": "ibmqx5",
+                        "text": "ibmqx5",
+                        "type": "button",
+                        "value": "ibmqx5{}".format(extension)
+                    },
+                ]
+            }
+        ]
+    }
+
+    headers = {
+        'content-type': "application/json",
+    }
+
+    response = requests.request("POST", response_url, data=json.dumps(payload), headers=headers)
+    print(response.text)
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
