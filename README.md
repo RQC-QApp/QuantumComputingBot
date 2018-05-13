@@ -1,14 +1,35 @@
 # QuantumComputingBot <img src="img/rqc.png" href='http://rqc.ru/' width='15%' align='right'>
 
-Monitoring the load of IBM Q processors from [IBM Quantum Experience](https://quantumexperience.ng.bluemix.net).
+Monitoring the load of IBM Q processors from [IBM Quantum Experience](https://quantumexperience.ng.bluemix.net) (data for 24 hours).
+
+| Calibration for [IBM QX 4](https://github.com/QISKit/ibmqx-backend-information/tree/master/backends/ibmqx4/V1) | Pending jobs for [IBM QX 5](https://github.com/QISKit/ibmqx-backend-information/blob/master/backends/ibmqx5/README.md)     |
+| :------------- | :------------- |
+| <img src="img/calibration_demo.png" width="200px">       | ...       |
+
+### Bot for Slack
 
 Bot is already available inside [QISKit](https://qiskit.org) workspace in [Slack](https://slack.com).<img src="img/qiskit-logo-black.png" href='http://rqc.ru/' width='7%' align='right'><img src="img/slack.png" href='http://rqc.ru/' width='7%' align='right'>
+
+Bot understands the following commands:
+
+* `/calibration [backend]` - send calibration info
+* `/jobs [backend]` - diagram of pending jobs
+* `/full [backend]` - calibration and pending jobs info for backend
+
+`backend` is the name for quantum processors like [ibmqx4](https://github.com/QISKit/ibmqx-backend-information/tree/master/backends/ibmqx4/V1) or [ibmqx5](https://github.com/QISKit/ibmqx-backend-information/blob/master/backends/ibmqx5/README.md).
 
 | Overview |
 | :------------- |
 | <img src="img/img3.jpg" width="200px">       |
 
+### Bot for Telegram
+
 You can try it here on [Telegram](https://telegram.org) -> [@QuantumComputingBot](https://t.me/QuantumComputingBot).<img src="img/telegram.png" href='http://rqc.ru/' width='7%' align='right'>
+
+Bot understands the following commands:
+
+* `/ibmqx4` - calibration and pending jobs info for [ibmqx4](https://github.com/QISKit/ibmqx-backend-information/tree/master/backends/ibmqx4/V1) processor
+* `/ibmqx5` - calibration and pending jobs info for [ibmqx5](https://github.com/QISKit/ibmqx-backend-information/blob/master/backends/ibmqx5/README.md) processor
 
 | Overview | Statistics for ibmqx4 processor     |
 | :------------- | :------------- |
