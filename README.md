@@ -2,7 +2,7 @@
 
 Monitoring the load of IBM Q processors from [IBM Quantum Experience](https://quantumexperience.ng.bluemix.net).
 
-Bot is already available inside [QISKit](https://qiskit.org) workspace in [Slack](https://slack.com).<img src="img/qiskit-logo-black.png" href='http://rqc.ru/' width='7%' align='right'>
+Bot is already available inside [QISKit](https://qiskit.org) workspace in [Slack](https://slack.com).<img src="img/qiskit-logo-black.png" href='http://rqc.ru/' width='7%' align='right'><img src="img/slack.png" href='http://rqc.ru/' width='7%' align='right'>
 
 | Overview |
 | :------------- |
