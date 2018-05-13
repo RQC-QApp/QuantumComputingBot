@@ -53,6 +53,7 @@ def plot_pending_jobs(backend):
     plt.figure(figsize=(11, 5))
     plt.grid(True, zorder=5)
     plt.fill_between(times, pending_jobs, color='brown')
+    plt.locator_params(axis='x', nbins=11)
     # New xticks.
     locs, labels = plt.xticks()
     new_ticks = [dt.fromtimestamp(x).strftime('%H:%M') for x in locs]
@@ -108,6 +109,7 @@ def plot_pending_jobs(backend):
     plt.figure(figsize=(11, 5))
     plt.grid(True, zorder=5)
     plt.fill_between(times, pending_jobs, color='brown')
+    plt.locator_params(axis='x', nbins=11)
     # New xticks.
     locs, labels = plt.xticks()
     new_ticks = [dt.fromtimestamp(x).strftime('%H:%M') for x in locs]
