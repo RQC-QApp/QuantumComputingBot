@@ -47,25 +47,78 @@ def plot_pending_jobs(backend):
     pending_jobs = [[y for y in x[1] if y['backend'] == backend][0]['pending_jobs']
                     for x in sorted(data, key=lambda x: x[0])]
 
+    ###
+    # Jobs Full.
+    plt.close()
     plt.figure(figsize=(11, 5))
     plt.grid(True, zorder=5)
     plt.fill_between(times, pending_jobs, color='brown')
-
     # New xticks.
     locs, labels = plt.xticks()
     new_ticks = [dt.fromtimestamp(x).strftime('%H:%M') for x in locs]
     plt.xticks(locs[1:-1], new_ticks[1:-1], rotation=0, fontsize=15)
     plt.yticks(fontsize=15)
-
     plt.ylim(0, math.ceil(max(pending_jobs)) + 1)
+    plt.title('IBMQ Backend: {},\nLocal time of bot: {}'.format(backend,
+              dt.fromtimestamp(time.time()).strftime('%Y, %b %d, %H:%M')), fontsize=15)
+    plt.xlabel('Time', fontsize=15)
+    plt.ylabel('# of pending jobs', fontsize=15)
+    plt.savefig('tmp/{}_jobs_full.png'.format(backend), bbox_inches='tight')
+    plt.close()
 
+    img_jobs = Image.open('tmp/{}_jobs_full.png'.format(backend), 'r')
+    img_jobs_w, img_jobs_h = img_jobs.size
+    img_background = Image.new('RGBA', (img_jobs_w, img_jobs_h),
+                               (255, 255, 255, 255))
+    img_background_w, img_background_h = img_background.size
+
+    #############
+    # Load Logos.
+    img_qiskit = Image.open('res/qiskit-logo.png', 'r')
+    factor = 7
+    img_qiskit = img_qiskit.resize((img_qiskit.size[0] // factor, img_qiskit.size[1] // factor))
+    img_qiskit_w, img_qiskit_h = img_qiskit.size
+
+    img_rqc = Image.open('res/rqc.jpg', 'r')
+    factor = 13
+    img_rqc = img_rqc.resize((img_rqc.size[0] // factor, img_rqc.size[1] // factor))
+    img_rqc_w, img_rqc_h = img_rqc.size
+    ####
+
+    ########
+    # Paste.
+    offset = (0, 0)
+    img_background.paste(img_jobs, offset)
+
+    displacement_h = 8
+    displacement_w = 10
+    offset = (img_background_w - img_qiskit_w - displacement_w, displacement_h - 4)
+    img_background.paste(img_qiskit, offset)
+
+    offset = (img_background_w - img_rqc_w - img_qiskit_w - displacement_w - 7, displacement_h)
+    img_background.paste(img_rqc, offset)
+    img_background.save('tmp/{}_jobs_full.png'.format(backend))
+    img_background.close()
+    img_rqc.close()
+    img_jobs.close()
+
+    ###
+    # Jobs Part.
+    plt.close()
+    plt.figure(figsize=(11, 5))
+    plt.grid(True, zorder=5)
+    plt.fill_between(times, pending_jobs, color='brown')
+    # New xticks.
+    locs, labels = plt.xticks()
+    new_ticks = [dt.fromtimestamp(x).strftime('%H:%M') for x in locs]
+    plt.xticks(locs[1:-1], new_ticks[1:-1], rotation=0, fontsize=15)
+    plt.yticks(fontsize=15)
+    plt.ylim(0, math.ceil(max(pending_jobs)) + 1)
     plt.title('Local time of bot: {}'.format(dt.fromtimestamp(time.time()).strftime('%Y, %b %d, %H:%M')),
               fontsize=15)
     plt.xlabel('Time', fontsize=15)
     plt.ylabel('# of pending jobs', fontsize=15)
-
-    filename = 'tmp/{}.png'.format(backend)
-    plt.savefig(filename, bbox_inches='tight')
+    plt.savefig('tmp/{}_jobs_part.png'.format(backend), bbox_inches='tight')
     plt.close()
 
 
@@ -77,9 +130,13 @@ def plot_calibration(backend, api):
     qubits = [full_info['qubits'][qub]['name'] for qub in range(N_qubits)]
     readout_error = [full_info['qubits'][qub]['readoutError']['value'] for qub in range(N_qubits)]
     readout_error = np.array([readout_error])
+    full_info = api.backend_calibration(backend=backend)
+    last_update = full_info['lastUpdateDate']
+    last_update = dt.strptime(last_update, "%Y-%m-%dT%H:%M:%S.000Z").timestamp()
+    last_update = dt.fromtimestamp(last_update).strftime('%Y, %b %d, %H:%M')
 
-    ###################
-    # Multiqubit error
+    #####
+    # Multiqubit error.
     multi_qubit_gates = [full_info['multiQubitGates'][qub]['qubits'] for qub in range(N_qubits)]
     multi_qubit_error = [full_info['multiQubitGates'][qub]['gateError']['value'] for qub in range(N_qubits)]
 
@@ -94,10 +151,65 @@ def plot_calibration(backend, api):
         error_matrix[qub2][qub1] = multi_qubit_error[i]
         error_matrix[i][i] = readout_error[0][i]
 
+    ###
+    # Calibration Full.
     plt.close()
     plt.figure(figsize=(6, 6))
     plt.matshow(error_matrix, cmap='Reds', fignum=1)
-    # plt.title('Backend: {}, Two qubit gate errors,\n last calibration: {}'.format(backend, last_update), fontsize=15)
+    plt.title('IBMQ Backend: {},\nTwo qubit gate errors,\nLast calibration: {}'.format(backend, last_update), fontsize=15)
+    # Placing actual values in the matshow plot
+    for (i, j), value in np.ndenumerate(error_matrix):
+        if not np.isnan(value):
+            plt.text(j, i, '{:0.2f}'.format(value), ha='center', va='center')
+    # Formatting axes
+    plt.yticks(np.arange(N_qubits), qubits)
+    plt.xticks(np.arange(N_qubits), qubits)
+    plt.autoscale(axis='both', tight=True)
+    plt.savefig('tmp/{}_calibration_full.png'.format(backend), bbox_inches='tight')
+    plt.close()
+
+    img_calib = Image.open('tmp/{}_calibration_full.png'.format(backend), 'r')
+    img_calib_w, img_calib_h = img_calib.size
+    img_background = Image.new('RGBA', (img_calib_w, img_calib_h),
+                               (255, 255, 255, 255))
+    img_background_w, img_background_h = img_background.size
+
+    #############
+    # Load Logos.
+    img_qiskit = Image.open('res/qiskit-logo.png', 'r')
+    factor = 8
+    img_qiskit = img_qiskit.resize((img_qiskit.size[0] // factor, img_qiskit.size[1] // factor))
+    img_qiskit_w, img_qiskit_h = img_qiskit.size
+
+    img_rqc = Image.open('res/rqc.jpg', 'r')
+    factor = 15
+    img_rqc = img_rqc.resize((img_rqc.size[0] // factor, img_rqc.size[1] // factor))
+    img_rqc_w, img_rqc_h = img_rqc.size
+    ####
+
+    #######
+    # Paste.
+    offset = (0, 0)
+    img_background.paste(img_calib, offset)
+
+    displacement_h = 5
+    displacement_w = 5
+    offset = (displacement_w, img_rqc_h + displacement_h)
+    img_background.paste(img_qiskit, offset)
+
+    offset = (displacement_w, displacement_h)
+    img_background.paste(img_rqc, offset)
+    img_background.save('tmp/{}_calibration_full.png'.format(backend))
+    img_background.close()
+    img_rqc.close()
+    img_calib.close()
+    ###
+
+    ###
+    # Calibration Part.
+    plt.close()
+    plt.figure(figsize=(6, 6))
+    plt.matshow(error_matrix, cmap='Reds', fignum=1)
     plt.title('Two qubit gate errors', fontsize=15)
     # Placing actual values in the matshow plot
     for (i, j), value in np.ndenumerate(error_matrix):
@@ -107,21 +219,21 @@ def plot_calibration(backend, api):
     plt.yticks(np.arange(N_qubits), qubits)
     plt.xticks(np.arange(N_qubits), qubits)
     plt.autoscale(axis='both', tight=True)
-    plt.savefig('tmp/{}_multiqubut_err.png'.format(backend), bbox_inches='tight')
+    plt.savefig('tmp/{}_calibration_part.png'.format(backend), bbox_inches='tight')
     plt.close()
 
 
-def create_statistics(backend, api):
+def plot_full(backend, api):
     plot_calibration(backend, api)
     plot_pending_jobs(backend)
 
-    img_merror = Image.open('tmp/{}_multiqubut_err.png'.format(backend), 'r')
-    img_merror_w, img_merror_h = img_merror.size
+    img_calib = Image.open('tmp/{}_calibration_part.png'.format(backend), 'r')
+    img_calib_w, img_calib_h = img_calib.size
 
-    img_jobs = Image.open('tmp/{}.png'.format(backend), 'r')
+    img_jobs = Image.open('tmp/{}_jobs_part.png'.format(backend), 'r')
     img_jobs_w, img_jobs_h = img_jobs.size
 
-    img_background = Image.new('RGBA', (img_merror_w + img_jobs_w, img_merror_h + 10),
+    img_background = Image.new('RGBA', (img_calib_w + img_jobs_w, img_calib_h + 10),
                                (255, 255, 255, 255))
     img_background_w, img_background_h = img_background.size
 
@@ -142,10 +254,10 @@ def create_statistics(backend, api):
     # Paste Plots.
     displacement_h = 10
     offset = (0, displacement_h)
-    img_background.paste(img_merror, offset)
+    img_background.paste(img_calib, offset)
 
     displacement_h = 50
-    offset = (img_merror_w, displacement_h)
+    offset = (img_calib_w, displacement_h)
     img_background.paste(img_jobs, offset)
     ####
 
@@ -169,15 +281,13 @@ def create_statistics(backend, api):
     draw = ImageDraw.Draw(img_background)
     font = ImageFont.truetype(font_path, 16)
     title = 'IBMQ Backend: {},\nLast calibration: {}'.format(backend, last_update)
-    draw.text((img_merror_w + 45, 10), title, (0, 0, 0), font=font)
+    draw.text((img_calib_w + 45, 10), title, (0, 0, 0), font=font)
 
-    img_background
-
-    img_background.save('tmp/{}_to_send.png'.format(backend))
+    img_background.save('tmp/{}_full.png'.format(backend))
 
     img_background.close()
     img_rqc.close()
-    img_merror.close()
+    img_calib.close()
     img_jobs.close()
 
 

@@ -1,4 +1,5 @@
 from flask import abort, Flask, jsonify, request
+import concurrent.futures as cf
 import requests
 import logging
 import utils
@@ -13,12 +14,16 @@ logger.setLevel(logging.DEBUG)
 app = Flask(__name__)
 
 slack_token = utils.get_token('res/token_slack.json')
+pool = cf.ThreadPoolExecutor(4)
+
+extension_calibration = '_calibration_full.png'
+extension_jobs = '_jobs_full.png'
+extension_full = '_full.png'
 
 
 ###
 # Slack API
 ###
-
 @app.route('/confirm', methods=['POST'])
 def confirm():
     req = request.form.to_dict()
@@ -26,18 +31,22 @@ def confirm():
     backend = data["actions"][0]["name"]
     value = data["actions"][0]["value"]
 
-    payload = {
-        "text": "Ok :slightly_smiling_face:",
-    }
-    headers = {
-        'content-type': "application/json",
-    }
-    response = requests.request("POST", data['response_url'], data=json.dumps(payload), headers=headers)
-    print(response.text)
+    reply = None
+    name = None
+    if value.endswith(extension_jobs):
+        name = 'Pending jobs for {}'.format(backend)
+        reply = '*Pending jobs* for {} will be sent soon ...'.format(backend)
+    elif value.endswith(extension_calibration):
+        name = 'Calibration info for {}'.format(backend)
+        reply = '*Calibration info* for {} will be sent soon ...'.format(backend)
+    elif value.endswith(extension_full):
+        name = 'Full statistics for {}'.format(backend)
+        reply = '*Full statistics* for {} will be sent soon ...'.format(backend)
 
-    send_image('tmp/{}'.format(value), backend, data['channel']['id'])
+    if name is not None:
+        pool.submit(send_image, 'tmp/{}'.format(value), name, data['channel']['id'])
 
-    return ""
+    return reply
 
 
 ###
@@ -48,15 +57,14 @@ def calibration():
     data = request.form.to_dict()
     backend = data['text'].lower()
 
-    extension = '_multiqubut_err.png'
-
     if backend in utils.backends:
-        quick_response(data['response_url'])
-        send_image('tmp/{}{}'.format(backend, extension), backend, data['channel_id'])
+        name = 'Calibration info for {}'.format(backend)
+        pool.submit(send_image, 'tmp/{}{}'.format(backend, extension_calibration),
+                    name, data['channel_id'])
+        return "Wait a sec ..."
     else:
-        send_buttons(data["response_url"], extension)
-
-    return ""
+        send_buttons(data["response_url"], extension_calibration)
+        return ''
 
 
 @app.route('/jobs', methods=['POST'])
@@ -64,15 +72,14 @@ def jobs():
     data = request.form.to_dict()
     backend = data['text'].lower()
 
-    extension = '.png'
-
     if backend in utils.backends:
-        quick_response(data['response_url'])
-        send_image('tmp/{}{}'.format(backend, extension), backend, data['channel_id'])
+        name = 'Pending jobs for {}'.format(backend)
+        pool.submit(send_image, 'tmp/{}{}'.format(backend, extension_jobs),
+                    name, data['channel_id'])
+        return "Wait a sec ..."
     else:
-        send_buttons(data["response_url"], extension)
-
-    return ""
+        send_buttons(data["response_url"], extension_jobs)
+        return ''
 
 
 @app.route('/full', methods=['POST'])
@@ -80,31 +87,19 @@ def full():
     data = request.form.to_dict()
     backend = data['text'].lower()
 
-    extension = '_to_send.png'
-
     if backend in utils.backends:
-        quick_response(data['response_url'])
-        send_image('tmp/{}{}'.format(backend, extension), backend, data['channel_id'])
+        name = 'Full statistics for {}'.format(backend)
+        pool.submit(send_image, 'tmp/{}{}'.format(backend, extension_full),
+                    name, data['channel_id'])
+        return "Wait a sec ..."
     else:
-        send_buttons(data["response_url"], extension)
-
-    return ""
+        send_buttons(data["response_url"], extension_full)
+        return ''
 
 
 ###
 # Helper Functions
 ###
-def quick_response(response_url):
-    payload = {
-        "text": "Wait a sec :hourglass_flowing_sand:",
-    }
-    headers = {
-        'content-type': "application/json",
-    }
-    response = requests.request("POST", response_url, data=json.dumps(payload), headers=headers)
-    print(response.text)
-
-
 def send_image(path, name, channel):
     my_file = {
         'file': (path, open(path, 'rb'), 'png')

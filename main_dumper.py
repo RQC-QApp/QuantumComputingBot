@@ -5,6 +5,7 @@ import json
 import time
 import pickle
 import logging
+import requests
 import os
 import utils
 
@@ -36,12 +37,20 @@ def dumper(delay):
         # Load.
         data = utils.load_data()
 
+        # Store data for 24 hours only.
+        day_back = max([x[0] for x in data]) - 86400
+        data = list(filter(lambda x: x[0] >= day_back, data))
+
         # Append.
         # remote_backends = discover_remote_backends(api)
         remote_backends = utils.backends
-        device_status = [api.backend_status(backend) for backend in remote_backends]
-
-        data.append((time.time(), device_status))
+        try:
+            device_status = [api.backend_status(backend) for backend in remote_backends]
+            data.append((time.time(), device_status))
+        except requests.exceptions.ConnectionError as e:
+            print(e)
+        except Exception as e:
+            pass
 
         # Store.
         if step == 0:
@@ -57,7 +66,7 @@ def dumper(delay):
         #############
         # Make Plots.
         for backend in utils.backends:
-            utils.create_statistics(backend, api)
+            utils.plot_full(backend, api)
         ###
 
         # Sleep.
@@ -65,7 +74,7 @@ def dumper(delay):
 
 
 def main():
-    delay = 60  # Seconds.
+    delay = 30  # Seconds.
     dumper(delay)
 
 
