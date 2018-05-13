@@ -49,7 +49,7 @@ def choose_backend(bot, update):
     if path is None:
         help(bot, update)
     else:
-        bot.send_photo(chat_id=user_id, photo=open(path.format(backend), 'rb'))
+        bot.send_photo(chat_id=user_id, photo=open(path, 'rb'))
     return
 
 
