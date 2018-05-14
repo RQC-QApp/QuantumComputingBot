@@ -124,7 +124,7 @@ def send_image(path, name, channel):
         'file': (path, open(path, 'rb'), 'png')
     }
     payload = {
-        "filename": name,
+        "filename": '{}.png'.format(name),
         'token': slack_token,
         "channels": [channel]
     }
