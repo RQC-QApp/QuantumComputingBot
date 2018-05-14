@@ -158,7 +158,7 @@ def plot_calibration(backend, api):
     plt.close()
     plt.figure(figsize=(6, 6))
     plt.matshow(error_matrix, cmap='Reds', fignum=1)
-    plt.title('IBMQ Backend: {},\nTwo qubit gate errors,\nLast calibration: {}'.format(backend, last_update), fontsize=15)
+    plt.title('IBMQ Backend: {},\nQubit gate errors,\nLast calibration: {}'.format(backend, last_update), fontsize=15)
     # Placing actual values in the matshow plot
     for (i, j), value in np.ndenumerate(error_matrix):
         if not np.isnan(value):
@@ -212,7 +212,7 @@ def plot_calibration(backend, api):
     plt.close()
     plt.figure(figsize=(6, 6))
     plt.matshow(error_matrix, cmap='Reds', fignum=1)
-    plt.title('Two qubit gate errors', fontsize=15)
+    plt.title('Qubit gate errors', fontsize=15)
     # Placing actual values in the matshow plot
     for (i, j), value in np.ndenumerate(error_matrix):
         if not np.isnan(value):
