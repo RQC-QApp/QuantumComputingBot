@@ -16,7 +16,8 @@ app = Flask(__name__)
 slack_token = utils.get_token('res/token_slack.json')
 pool = cf.ThreadPoolExecutor(4)
 
-extension_calibration = '_calibration_full.png'
+extension_gateerrors = '_gateerrors_full.png'
+extension_readouterrors = '_readouterrors_full.png'
 extension_jobs = '_jobs_full.png'
 extension_full = '_full.png'
 
@@ -36,9 +37,12 @@ def confirm():
     if value.endswith(extension_jobs):
         name = 'Pending jobs for {}'.format(backend)
         reply = '*Pending jobs* for {} will be sent soon ...'.format(backend)
-    elif value.endswith(extension_calibration):
-        name = 'Calibration info for {}'.format(backend)
-        reply = '*Calibration info* for {} will be sent soon ...'.format(backend)
+    elif value.endswith(extension_gateerrors):
+        name = 'Gate errors for {}'.format(backend)
+        reply = '*Gate errors* for {} will be sent soon ...'.format(backend)
+    elif value.endswith(extension_readouterrors):
+        name = 'Readout errors for {}'.format(backend)
+        reply = '*Readout errors* for {} will be sent soon ...'.format(backend)
     elif value.endswith(extension_full):
         name = 'Full statistics for {}'.format(backend)
         reply = '*Full statistics* for {} will be sent soon ...'.format(backend)
@@ -52,18 +56,33 @@ def confirm():
 ###
 # Bot Commands
 ###
-@app.route('/calibration', methods=['POST'])
-def calibration():
+@app.route('/gateerrors', methods=['POST'])
+def gateerrors():
     data = request.form.to_dict()
     backend = data['text'].lower()
 
     if backend in utils.backends:
-        name = 'Calibration info for {}'.format(backend)
-        pool.submit(send_image, 'tmp/{}{}'.format(backend, extension_calibration),
+        name = 'Gate errors for {}'.format(backend)
+        pool.submit(send_image, 'tmp/{}{}'.format(backend, extension_gateerrors),
                     name, data['channel_id'])
         return "Wait a sec ..."
     else:
-        send_buttons(data["response_url"], extension_calibration)
+        send_buttons(data["response_url"], extension_gateerrors)
+        return ''
+
+
+@app.route('/readouterrors', methods=['POST'])
+def readouterrors():
+    data = request.form.to_dict()
+    backend = data['text'].lower()
+
+    if backend in utils.backends:
+        name = 'Gate errors for {}'.format(backend)
+        pool.submit(send_image, 'tmp/{}{}'.format(backend, extension_readouterrors),
+                    name, data['channel_id'])
+        return "Wait a sec ..."
+    else:
+        send_buttons(data["response_url"], extension_readouterrors)
         return ''
 
 

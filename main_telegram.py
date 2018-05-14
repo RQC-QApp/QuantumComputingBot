@@ -13,11 +13,13 @@ logger.setLevel(logging.DEBUG)
 info_text = []
 info_text.append('You can control me by sending these commands:')
 info_text.append('')
-info_text.append('/calibration_ibmqx4 - send calibration info')
+info_text.append('/gate_errors_ibmqx4 - send gate errorss')
+info_text.append('/readout_errors_ibmqx4 - send readout errors')
 info_text.append('/jobs_ibmqx4 - diagram of pending jobs')
 info_text.append('/full_ibmqx4 - calibration and pending jobs info')
 info_text.append('')
-info_text.append('/calibration_ibmqx5 - send calibration info')
+info_text.append('/gate_errors_ibmqx5 - send gate errors')
+info_text.append('/readout_errors_ibmqx5 - send readout errors')
 info_text.append('/jobs_ibmqx5 - diagram of pending jobs')
 info_text.append('/full_ibmqx5 - calibration and pending jobs info')
 info_text = '\n'.join(info_text)
@@ -33,14 +35,18 @@ def choose_backend(bot, update):
 
     command = update.message.text.lower()
     path = None
-    if command == '/calibration_ibmqx4':
-        path = 'tmp/ibmqx4_calibration_full.png'
+    if command == '/gate_errors_ibmqx4':
+        path = 'tmp/ibmqx4_gateerrors_full.png'
+    elif command == '/readout_errors_ibmqx4':
+        path = 'tmp/ibmqx4_readouterrors_full.png'
     elif command == '/jobs_ibmqx4':
         path = 'tmp/ibmqx4_jobs_full.png'
     elif command == '/full_ibmqx4':
         path = 'tmp/ibmqx4_full.png'
-    elif command == '/calibration_ibmqx5':
-        path = 'tmp/ibmqx5_calibration_full.png'
+    elif command == '/gate_errors_ibmqx5':
+        path = 'tmp/ibmqx5_gateerrors_full.png'
+    elif command == '/readout_errors_ibmqx5':
+        path = 'tmp/ibmqx5_readouterrors_full.png'
     elif command == '/jobs_ibmqx5':
         path = 'tmp/ibmqx5_jobs_full.png'
     elif command == '/full_ibmqx5':
