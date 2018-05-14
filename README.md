@@ -4,7 +4,7 @@ Monitoring the load of IBM Q processors from [IBM Quantum Experience](https://qu
 
 | Calibration for [IBM QX 4](https://github.com/QISKit/ibmqx-backend-information/tree/master/backends/ibmqx4/V1) | Pending jobs for [IBM QX 5](https://github.com/QISKit/ibmqx-backend-information/blob/master/backends/ibmqx5/README.md)     |
 | :------------- | :------------- |
-| <img src="img/calibration_demo.png" width="200px">       | ...       |
+| <img src="img/errors_demo.png" width="200px">       | <img src="img/jobs_demo.png" width="400px">       |
 
 ### Bot for Slack
 
@@ -12,15 +12,21 @@ Bot is already available inside [QISKit](https://qiskit.org) workspace in [Slack
 
 Bot understands the following commands:
 
-* `/calibration [backend]` - send calibration info
-* `/jobs [backend]` - diagram of pending jobs
 * `/full [backend]` - calibration and pending jobs info for backend
+* `/gate_errors [backend]` - send gate errors
+* `/jobs [backend]` - diagram of pending jobs
+* `/readout_errors [backend]` - send readout errors
 
 `backend` is the name for quantum processors like [ibmqx4](https://github.com/QISKit/ibmqx-backend-information/tree/master/backends/ibmqx4/V1) or [ibmqx5](https://github.com/QISKit/ibmqx-backend-information/blob/master/backends/ibmqx5/README.md).
 
-| Overview |
-| :------------- |
-| <img src="img/img3.jpg" width="200px">       |
+| Step 1 | Step 2 | Step 3 |
+| :-------------: | :-------------: | :-------------: |
+| <img src="img/slack_1.jpg" width="200px">       | <img src="img/slack_2.jpg" width="200px">       | <img src="img/slack_3.jpg" width="200px">       |
+
+| Pass backend as argument - 1 | Pass backend as argument - 2 |
+| :-------------: | :-------------: |
+| <img src="img/slack_jobs_1.jpg" width="200px">       | <img src="img/slack_jobs_2.jpg" width="200px">       |
+
 
 ### Bot for Telegram
 
@@ -28,12 +34,14 @@ You can try it here on [Telegram](https://telegram.org) -> [@QuantumComputingBot
 
 Bot understands the following commands:
 
-* `/ibmqx4` - calibration and pending jobs info for [ibmqx4](https://github.com/QISKit/ibmqx-backend-information/tree/master/backends/ibmqx4/V1) processor
-* `/ibmqx5` - calibration and pending jobs info for [ibmqx5](https://github.com/QISKit/ibmqx-backend-information/blob/master/backends/ibmqx5/README.md) processor
+* `/gate_errors_ibmqx4` - send gate errors
+* `/readout_errors_ibmqx4` - send readout errors
+* `/jobs_ibmqx4` - diagram of pending jobs
+* `/full_ibmqx4` - calibration and pending jobs info
 
-| Overview | Statistics for ibmqx4 processor     |
-| :------------- | :------------- |
-| <img src="img/img1.jpg" width="200px">       | <img src="img/img2.jpg" width="200px">       |
+| Commands | Overview     |
+| :-------------: | :-------------: |
+| <img src="img/telegram_1.jpg" width="200px">       | <img src="img/telegram_2.jpg" width="200px">       |
 
 ## Description
 
@@ -49,17 +57,15 @@ Structure of the project:
 │   ├── real_data_1.pkl
 │   └── ...
 ├── img                    <- Images for this README.
-│   ├── img1.jpg
+│   ├── jobs_demo.jpg
 │   └── ...
 ├── res                    <- Folder with different resource files
 |   |                         including tokens for APIs.
-│   ├── qiskit-logo.png
 │   ├── rqc.jpg
 │   ├── token_q.json
 │   └── ...
 └── tmp                    <- Folder with generated plots.
-    ├── ibmqx4.png
-    ├── ibmqx4_multiqubut_err.png
+    ├── ibmqx4_full.png
     └── ...
 ```
 
