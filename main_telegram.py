@@ -13,7 +13,7 @@ logger.setLevel(logging.DEBUG)
 info_text = []
 info_text.append('You can control me by sending these commands:')
 info_text.append('')
-info_text.append('/gate_errors_ibmqx4 - send gate errorss')
+info_text.append('/gate_errors_ibmqx4 - send gate errors')
 info_text.append('/readout_errors_ibmqx4 - send readout errors')
 info_text.append('/jobs_ibmqx4 - diagram of pending jobs')
 info_text.append('/full_ibmqx4 - calibration and pending jobs info')
