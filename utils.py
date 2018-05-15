@@ -5,6 +5,7 @@ from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw
 import numpy as np
+import requests
 import threading
 import pickle
 import time
@@ -122,10 +123,18 @@ def plot_pending_jobs(backend):
     plt.ylabel('# of pending jobs', fontsize=15)
     plt.savefig('tmp/{}_jobs_part.png'.format(backend), bbox_inches='tight')
     plt.close()
+    return
 
 
 def plot_readout_errors(backend, api):
-    full_info = api.backend_calibration(backend=backend)
+    try:
+        full_info = api.backend_calibration(backend=backend)
+    except requests.exceptions.ConnectionError as e:
+        print(e)
+        return
+    except Exception as e:
+        print(e)
+        return
 
     N_qubits = len(full_info['qubits'])
     qubits = [full_info['qubits'][qub]['name'] for qub in range(N_qubits)]
@@ -212,10 +221,18 @@ def plot_readout_errors(backend, api):
     plt.margins(tight=True)
     plt.savefig('tmp/{}_readouterrors_part.png'.format(backend), bbox_inches='tight')
     plt.close()
+    return
 
 
 def plot_gate_errors(backend, api):
-    full_info = api.backend_calibration(backend=backend)
+    try:
+        full_info = api.backend_calibration(backend=backend)
+    except requests.exceptions.ConnectionError as e:
+        print(e)
+        return
+    except Exception as e:
+        print(e)
+        return
 
     # Info.
     N_qubits = len(full_info['qubits'])
