@@ -239,7 +239,7 @@ def plot_gate_errors(backend, api):
     qubits = [full_info['qubits'][qub]['name'] for qub in range(N_qubits)]
     gate_error = [full_info['qubits'][qub]['gateError']['value'] for qub in range(N_qubits)]
     gate_error = np.array([gate_error])
-    full_info = api.backend_calibration(backend=backend)
+
     last_update = full_info['lastUpdateDate']
     last_update = dt.strptime(last_update, "%Y-%m-%dT%H:%M:%S.000Z").timestamp()
     last_update = dt.fromtimestamp(last_update).strftime('%Y, %b %d, %H:%M')
