@@ -1,4 +1,3 @@
-from qiskit.backends import discover_local_backends, discover_remote_backends
 from IBMQuantumExperience import IBMQuantumExperience
 from slackclient import SlackClient
 import json
@@ -37,9 +36,10 @@ def dumper(delay):
         # Load.
         data = utils.load_data()
 
-        # Store data for 24 hours only.
-        day_back = max([x[0] for x in data]) - 86400
-        data = list(filter(lambda x: x[0] >= day_back, data))
+        if len(data) > 0:
+            # Store data for 24 hours only.
+            day_back = max([x[0] for x in data]) - 86400
+            data = list(filter(lambda x: x[0] >= day_back, data))
 
         # Append.
         # remote_backends = discover_remote_backends(api)

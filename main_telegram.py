@@ -70,8 +70,14 @@ def help(bot, update):
 
 
 def main():
-    updater = Updater(utils.get_token('res/token_telegram.json'))
-    bot = telegram.Bot(token=utils.get_token('res/token_telegram.json'))
+    print('-> USE PROXY')
+
+    token = utils.get_token('res/token_telegram.json')
+    req = telegram.utils.request.Request(proxy_url='socks5://127.0.0.1:9050',
+                                         read_timeout=30, connect_timeout=20,
+                                         con_pool_size=10)
+    bot = telegram.Bot(token=token, request=req)
+    updater = Updater(bot=bot)
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler('info', info))
