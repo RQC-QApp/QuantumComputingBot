@@ -73,7 +73,7 @@ def main():
     print('-> USE PROXY')
 
     token = utils.get_token('res/token_telegram.json')
-    req = telegram.utils.request.Request(proxy_url='socks5://127.0.0.1:9050',
+    req = telegram.utils.request.Request(proxy_url='socks5h://127.0.0.1:9050',
                                          read_timeout=30, connect_timeout=20,
                                          con_pool_size=10)
     bot = telegram.Bot(token=token, request=req)

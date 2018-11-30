@@ -86,11 +86,11 @@ def readouterrors():
         return ''
 
 
-@app.route('/jobs', methods=['POST'])
+@app.route('/jobs', methods=['GET', 'POST'])
 def jobs():
     data = request.form.to_dict()
     backend = data['text'].lower()
-
+    return "kek"
     if backend in utils.backends:
         name = 'Pending jobs for {}'.format(backend)
         pool.submit(send_image, 'tmp/{}{}'.format(backend, extension_jobs),
